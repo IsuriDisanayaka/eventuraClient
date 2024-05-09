@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
+import Navbar from "../components/nav/Navbar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import axios from "axios";
-import Modal from "./Modal/Modal";
+import Modal from "../components/modal/Modal";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 
@@ -130,6 +131,7 @@ function SchedulerCalendar() {
 
   return (
     <div className="App">
+      <Navbar />
       <Calendar
         selectable
         localizer={localizer}
@@ -139,7 +141,7 @@ function SchedulerCalendar() {
         defaultDate={new Date()}
         onSelectEvent={handleSelectEvent}
         onSelectSlot={handleSelectSlot}
-        style={{ height: "100vh" }}
+        style={{ height: "100%" }}
         onDoubleClickEvent={handleSelectEvent}
         timeslots={2}
         step={30}

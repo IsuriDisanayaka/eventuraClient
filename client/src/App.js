@@ -1,6 +1,6 @@
 import React from "react";
 import { ToastContainer } from "react-toastify";
-import SchedulerCalendar from "./components/Calendar";
+import SchedulerCalendar from "./screen/Calendar";
 
 function App() {
   return (

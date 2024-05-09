@@ -8,7 +8,7 @@
   height: 13vh;
   position: fixed;
   z-index: 1000;
-  width: -webkit-fill-available; /* This might need browser-specific prefixes or adjustments */
+  width: -webkit-fill-available;
 }
 
 .navbar-logo {

@@ -141,7 +141,7 @@ function SchedulerCalendar() {
         defaultDate={new Date()}
         onSelectEvent={handleSelectEvent}
         onSelectSlot={handleSelectSlot}
-        style={{ height: "100%" }}
+        style={{ height: "100%", padding: "114px" }}
         onDoubleClickEvent={handleSelectEvent}
         timeslots={2}
         step={30}

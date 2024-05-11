@@ -5,8 +5,8 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import axios from "axios";
 import Modal from "../components/modal/Modal";
-import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
+import "../screen/Calendar.css";
 
 const localizer = momentLocalizer(moment);
 
@@ -14,33 +14,47 @@ function SchedulerCalendar() {
   const [events, setEvents] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/events");
-      const fetchedEvents = response.data.map((event) => ({
-        ...event,
-        start: new Date(event.start),
-        end: new Date(event.end),
-        title: event.name,
-        eventId: event.eventId,
-      }));
-      setEvents(fetchedEvents);
-    } catch (error) {}
-  };
-
-  const formatDateTimeLocal = (date) => {
-    return moment(date).local().format("YYYY-MM-DDTHH:mm");
-  };
-
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("userData"))
+  );
   const handleSelectSlot = ({ start, end }) => {
+    if (!user) {
+      toast.info("Please log in to add or edit events", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        toastId: "loginPrompt",
+      });
+      return;
+    }
     setSelectedEvent({
       start: formatDateTimeLocal(start),
       end: formatDateTimeLocal(end),
+    });
+    setModalOpen(true);
+  };
+
+  const handleSelectEvent = (event) => {
+    if (!user) {
+      toast.info("Please log in to add or edit events", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+    setSelectedEvent({
+      ...event,
+      name: event.title,
+      eventId: event.eventId,
     });
     setModalOpen(true);
   };
@@ -87,6 +101,34 @@ function SchedulerCalendar() {
       });
     }
   };
+  useEffect(() => {
+    if (user) {
+      fetchEvents();
+    }
+  }, [user]);
+
+  const fetchEvents = async () => {
+    if (!user) return;
+    try {
+      const response = await axios.get("http://localhost:5000/events");
+      const fetchedEvents = response.data.map((event) => ({
+        ...event,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        title: event.name,
+        eventId: event.eventId,
+      }));
+      setEvents(fetchedEvents);
+    } catch (error) {}
+  };
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedEvent(null);
+  };
+
+  const formatDateTimeLocal = (date) => {
+    return moment(date).local().format("YYYY-MM-DDTHH:mm");
+  };
 
   const deleteEvent = async (eventId) => {
     try {
@@ -115,38 +157,31 @@ function SchedulerCalendar() {
     }
   };
 
-  const handleSelectEvent = (event) => {
-    setSelectedEvent({
-      ...event,
-      name: event.title,
-      eventId: event.eventId,
-    });
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setSelectedEvent(null);
-  };
-
   return (
     <div className="App">
-      <Navbar />
-      <Calendar
-        selectable
-        localizer={localizer}
-        events={events}
-        defaultView="week"
-        scrollToTime={new Date(1970, 1, 1, 6)}
-        defaultDate={new Date()}
-        onSelectEvent={handleSelectEvent}
-        onSelectSlot={handleSelectSlot}
-        style={{ height: "100%", padding: "114px" }}
-        onDoubleClickEvent={handleSelectEvent}
-        timeslots={2}
-        step={30}
-      />
-
+      <Navbar onUserLogin={setUser} />
+      <div className="calendar-container">
+        <Calendar
+          selectable={!user}
+          localizer={localizer}
+          events={events}
+          defaultView="week"
+          scrollToTime={new Date(1970, 1, 1, 6)}
+          defaultDate={new Date()}
+          onSelectEvent={handleSelectEvent}
+          onSelectSlot={handleSelectSlot}
+          style={{ height: "100%", padding: "114px" }}
+          onDoubleClickEvent={handleSelectEvent}
+          timeslots={2}
+          step={30}
+          className={!user ? "calendar-blurred" : ""}
+        />
+        {!user && (
+          <div className="login-prompt">
+            Please log in to interact with the calendar
+          </div>
+        )}
+      </div>
       {modalOpen && (
         <Modal
           isOpen={modalOpen}

@@ -3,6 +3,7 @@ import { FaUserCircle } from "react-icons/fa";
 import logo from "../../assets/img/logo.png";
 import "./Navbar.css";
 import { useGoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [user, setUser] = useState(
@@ -35,12 +36,43 @@ const Navbar = () => {
             }),
           })
             .then((response) => response.json())
-            .then((data) => console.log("User saved:", data))
-            .catch((error) => console.error("Error saving user:", error));
+            .then((data) =>
+              toast.success("Welcome!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              })
+            )
+
+            .catch((error) =>
+              toast.error("Error! try again", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              })
+            );
+          window.location.reload();
         });
     },
     onError: () => {
-      console.log("Login Failed");
+      toast.error("Error! try again", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.location.reload();
       setUser(null);
       localStorage.removeItem("userData");
     },
@@ -51,6 +83,7 @@ const Navbar = () => {
     setUser(null);
     localStorage.removeItem("userData");
     setShowDropdown(false);
+    window.location.reload();
   };
 
   const toggleDropdown = () => {
@@ -66,7 +99,7 @@ const Navbar = () => {
         {user ? (
           <div>
             <img
-              src={user.picture || "/path/to/default/avatar"}
+              src={user.picture}
               alt="User"
               style={{
                 width: 30,

@@ -16,7 +16,17 @@
   align-items: center;
   height: 15vh;
 }
-
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
 .navbar-icon {
   left: 20px;
 }

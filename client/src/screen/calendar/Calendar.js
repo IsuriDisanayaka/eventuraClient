@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import Navbar from "../components/nav/Navbar";
+import Navbar from "../../components/nav/Navbar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import axios from "axios";
-import Modal from "../components/modal/Modal";
+import Modal from "../../components/modal/Modal";
 import { toast } from "react-toastify";
-import "../screen/Calendar.css";
+import "./Calendar.css";
 
 const localizer = momentLocalizer(moment);
 
@@ -17,18 +17,10 @@ function SchedulerCalendar() {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("userData"))
   );
+  const [searchTerm, setSearchTerm] = useState("");
   const handleSelectSlot = ({ start, end }) => {
     if (!user) {
-      toast.info("Please log in to add or edit events", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        toastId: "loginPrompt",
-      });
+      toast.info("Please log in to manage events.");
       return;
     }
     setSelectedEvent({
@@ -40,22 +32,10 @@ function SchedulerCalendar() {
 
   const handleSelectEvent = (event) => {
     if (!user) {
-      toast.info("Please log in to add or edit events", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.info("Please log in to add or edit events");
       return;
     }
-    setSelectedEvent({
-      ...event,
-      name: event.title,
-      eventId: event.eventId,
-    });
+    setSelectedEvent({ ...event, name: event.title, eventId: event.eventId });
     setModalOpen(true);
   };
 
@@ -63,6 +43,8 @@ function SchedulerCalendar() {
     const { eventId, ...eventData } = eventDetails;
     eventData.start = new Date(eventData.start).toISOString();
     eventData.end = new Date(eventData.end).toISOString();
+    eventData.email = user.email;
+
     try {
       if (eventId) {
         await axios.put(`http://localhost:5000/event/${eventId}`, eventData);
@@ -101,6 +83,7 @@ function SchedulerCalendar() {
       });
     }
   };
+
   useEffect(() => {
     if (user) {
       fetchEvents();
@@ -132,7 +115,9 @@ function SchedulerCalendar() {
 
   const deleteEvent = async (eventId) => {
     try {
-      await axios.delete(`http://localhost:5000/event/${eventId}`);
+      await axios.delete(`http://localhost:5000/event/${eventId}`, {
+        data: { email: user.email },
+      });
       toast.success("Event deleted!", {
         position: "top-right",
         autoClose: 5000,
@@ -160,9 +145,17 @@ function SchedulerCalendar() {
   return (
     <div className="App">
       <Navbar onUserLogin={setUser} />
+
       <div className="calendar-container">
+        <input
+          type="text"
+          placeholder="Search events..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-box"
+        />
         <Calendar
-          selectable={!user}
+          selectable={!!user}
           localizer={localizer}
           events={events}
           defaultView="week"
@@ -177,9 +170,7 @@ function SchedulerCalendar() {
           className={!user ? "calendar-blurred" : ""}
         />
         {!user && (
-          <div className="login-prompt">
-            Please log in to interact with the calendar
-          </div>
+          <div className="login-prompt">Access the calendar by logging in.</div>
         )}
       </div>
       {modalOpen && (

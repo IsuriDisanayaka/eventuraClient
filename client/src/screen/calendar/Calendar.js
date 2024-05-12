@@ -17,7 +17,6 @@ function SchedulerCalendar() {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("userData"))
   );
-  const [searchTerm, setSearchTerm] = useState("");
   const handleSelectSlot = ({ start, end }) => {
     if (!user) {
       toast.info("Please log in to manage events.");
@@ -93,7 +92,9 @@ function SchedulerCalendar() {
   const fetchEvents = async () => {
     if (!user) return;
     try {
-      const response = await axios.get("http://localhost:5000/events");
+      const response = await axios.get(
+        `http://localhost:5000/events?email=${encodeURIComponent(user.email)}`
+      );
       const fetchedEvents = response.data.map((event) => ({
         ...event,
         start: new Date(event.start),
@@ -104,6 +105,7 @@ function SchedulerCalendar() {
       setEvents(fetchedEvents);
     } catch (error) {}
   };
+
   const closeModal = () => {
     setModalOpen(false);
     setSelectedEvent(null);
@@ -147,13 +149,6 @@ function SchedulerCalendar() {
       <Navbar onUserLogin={setUser} />
 
       <div className="calendar-container">
-        <input
-          type="text"
-          placeholder="Search events..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-box"
-        />
         <Calendar
           selectable={!!user}
           localizer={localizer}

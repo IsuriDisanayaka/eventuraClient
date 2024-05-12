@@ -1,0 +1,75 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}
+
+.modal-content {
+  background: white;
+  padding: 50px;
+  border-radius: 5px;
+  width: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.input-text,
+.textarea,
+.datetime-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.datetime-input {
+  width: 48%;
+  margin-right: 4%;
+}
+
+.button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.button-save {
+  background-color: #4caf50;
+}
+
+.button-delete {
+  background-color: #f44336;
+  margin-right: 304px;
+}
+
+.button-cancel {
+  background: #777;
+  color: white;
+}
+
+.button:hover {
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.button-save:hover {
+  background-color: #3e8e41;
+}
+
+.button-delete:hover {
+  background-color: #d32f2f;
+}
+
+.button-cancel:hover {
+  background-color: #666;
+}

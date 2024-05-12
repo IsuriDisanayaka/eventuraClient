@@ -37,6 +37,7 @@ function SchedulerCalendar() {
         end: new Date(event.end),
         title: event.name,
         eventId: event.eventId,
+        reminderSent: event.reminderSent,
       }));
       setEvents(mappedEvents);
     } catch (error) {}

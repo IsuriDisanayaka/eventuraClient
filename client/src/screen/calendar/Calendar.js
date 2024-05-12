@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import Navbar from "../../components/nav/Navbar";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import axios from "axios";
+import CustomToolbar from "../../components/CustomToolbar/CustomToolbar";
 import Modal from "../../components/modal/Modal";
 import { toast } from "react-toastify";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./Calendar.css";
+import { fetchEvents, saveEvent, deleteEvent } from "../../services/apiService";
 
 const localizer = momentLocalizer(moment);
 
@@ -17,16 +18,28 @@ function SchedulerCalendar() {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("userData"))
   );
-  const handleSelectSlot = ({ start, end }) => {
-    if (!user) {
-      toast.info("Please log in to manage events.");
-      return;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      handleFetchEvents();
     }
-    setSelectedEvent({
-      start: formatDateTimeLocal(start),
-      end: formatDateTimeLocal(end),
-    });
-    setModalOpen(true);
+  }, [user]);
+
+  const handleFetchEvents = async () => {
+    if (!user) return;
+    try {
+      const fetchedEvents = await fetchEvents(user.email);
+      const mappedEvents = fetchedEvents.map((event) => ({
+        ...event,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        title: event.name,
+        eventId: event.eventId,
+      }));
+      setEvents(mappedEvents);
+    } catch (error) {}
   };
 
   const handleSelectEvent = (event) => {
@@ -38,72 +51,43 @@ function SchedulerCalendar() {
     setModalOpen(true);
   };
 
-  const saveEvent = async (eventDetails) => {
-    const { eventId, ...eventData } = eventDetails;
-    eventData.start = new Date(eventData.start).toISOString();
-    eventData.end = new Date(eventData.end).toISOString();
-    eventData.email = user.email;
+  const handleSelectSlot = ({ start, end }) => {
+    if (!user) {
+      toast.info("Please log in to manage events.");
+      return;
+    }
+    setSelectedEvent({
+      start: moment(start).format("YYYY-MM-DDTHH:mm"),
+      end: moment(end).format("YYYY-MM-DDTHH:mm"),
+    });
+    setModalOpen(true);
+  };
 
+  const handleEventSave = async (eventDetails) => {
     try {
-      if (eventId) {
-        await axios.put(`http://localhost:5000/event/${eventId}`, eventData);
-        toast.success("Event updated!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      } else {
-        await axios.post("http://localhost:5000/event/save", eventData);
-        toast.success("Event created!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
-      fetchEvents();
+      await saveEvent(eventDetails.eventId, {
+        ...eventDetails,
+        start: new Date(eventDetails.start).toISOString(),
+        end: new Date(eventDetails.end).toISOString(),
+        email: user.email,
+      });
+      toast.success(eventDetails.eventId ? "Event updated!" : "Event created!");
+      handleFetchEvents();
       setModalOpen(false);
     } catch (error) {
-      toast.error("Error! try again", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.error("Error saving the event, please try again.");
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      fetchEvents();
-    }
-  }, [user]);
-
-  const fetchEvents = async () => {
-    if (!user) return;
+  const handleEventDelete = async (eventId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/events?email=${encodeURIComponent(user.email)}`
-      );
-      const fetchedEvents = response.data.map((event) => ({
-        ...event,
-        start: new Date(event.start),
-        end: new Date(event.end),
-        title: event.name,
-        eventId: event.eventId,
-      }));
-      setEvents(fetchedEvents);
-    } catch (error) {}
+      await deleteEvent(eventId, user.email);
+      toast.success("Event deleted!");
+      handleFetchEvents();
+      setModalOpen(false);
+    } catch (error) {
+      toast.error("Error deleting the event, please try again.");
+    }
   };
 
   const closeModal = () => {
@@ -111,49 +95,40 @@ function SchedulerCalendar() {
     setSelectedEvent(null);
   };
 
-  const formatDateTimeLocal = (date) => {
-    return moment(date).local().format("YYYY-MM-DDTHH:mm");
-  };
-
-  const deleteEvent = async (eventId) => {
-    try {
-      await axios.delete(`http://localhost:5000/event/${eventId}`, {
-        data: { email: user.email },
-      });
-      toast.success("Event deleted!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      fetchEvents();
-      setModalOpen(false);
-    } catch (error) {
-      toast.error("Error! try again", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
+  const filteredEvents = events.filter((event) =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const customMessages = {
+    noEventsInRange: "No results found.",
   };
 
   return (
     <div className="App">
       <Navbar onUserLogin={setUser} />
-
+      <div>
+        {searchResults.map((event) => (
+          <div key={event.eventId}>
+            {event.name} - {event.date}
+          </div>
+        ))}
+      </div>
       <div className="calendar-container">
         <Calendar
           selectable={!!user}
           localizer={localizer}
-          events={events}
-          defaultView="week"
+          events={filteredEvents}
+          defaultView="month"
+          views={["month", "week", "day", "agenda"]}
+          components={{
+            toolbar: (props) => (
+              <CustomToolbar
+                {...props}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+              />
+            ),
+          }}
+          messages={customMessages}
           scrollToTime={new Date(1970, 1, 1, 6)}
           defaultDate={new Date()}
           onSelectEvent={handleSelectEvent}
@@ -165,15 +140,15 @@ function SchedulerCalendar() {
           className={!user ? "calendar-blurred" : ""}
         />
         {!user && (
-          <div className="login-prompt">Access the calendar by logging in.</div>
+          <div className="login-pop">Access the calendar by logging in.</div>
         )}
       </div>
       {modalOpen && (
         <Modal
           isOpen={modalOpen}
           onClose={closeModal}
-          onSave={saveEvent}
-          onDelete={deleteEvent}
+          onSave={handleEventSave}
+          onDelete={handleEventDelete}
           initialEvent={selectedEvent}
         />
       )}

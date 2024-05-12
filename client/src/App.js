@@ -1,24 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { ToastContainer } from "react-toastify";
+import SchedulerCalendar from "./screen/calendar/Calendar";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <div className="App">
+        <ToastContainer />
+        <SchedulerCalendar />
+      </div>
+    </GoogleOAuthProvider>
   );
 }
 

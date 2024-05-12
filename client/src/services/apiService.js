@@ -12,9 +12,9 @@ export const fetchEvents = async (email) => {
 export const saveEvent = async (eventId, eventData) => {
   const { eventId: id, ...rest } = eventData;
   if (eventId) {
-    return await axios.put(`http://localhost:5000/event/${eventId}`, rest);
+    return await axios.put(`${BASE_URL}/event/${eventId}`, rest);
   } else {
-    return await axios.post(`http://localhost:5000/event/save`, eventData);
+    return await axios.post(`${BASE_URL}/event/save`, eventData);
   }
 };
 

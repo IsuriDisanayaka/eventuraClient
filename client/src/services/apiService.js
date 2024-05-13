@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const BASE_URL = process.env.BASE_URL;
+const baseUrl = process.env.REACT_APP_BASE_URL;
 
 export const fetchEvents = async (email) => {
   const response = await axios.get(
-    `${BASE_URL}/events?email=${encodeURIComponent(email)}`
+    `${baseUrl}/events?email=${encodeURIComponent(email)}`
   );
   return response.data;
 };
@@ -12,14 +12,14 @@ export const fetchEvents = async (email) => {
 export const saveEvent = async (eventId, eventData) => {
   const { eventId: id, ...rest } = eventData;
   if (eventId) {
-    return await axios.put(`${BASE_URL}/event/${eventId}`, rest);
+    return await axios.put(`${baseUrl}/event/${eventId}`, rest);
   } else {
-    return await axios.post(`${BASE_URL}/event/save`, eventData);
+    return await axios.post(`${baseUrl}/event/save`, eventData);
   }
 };
 
 export const deleteEvent = async (eventId, email) => {
-  return await axios.delete(`${BASE_URL}/event/${eventId}`, {
+  return await axios.delete(`${baseUrl}/event/${eventId}`, {
     data: { email },
   });
 };

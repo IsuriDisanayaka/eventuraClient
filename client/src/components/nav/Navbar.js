@@ -10,7 +10,7 @@ const Navbar = () => {
     JSON.parse(localStorage.getItem("userData"))
   );
   const [showDropdown, setShowDropdown] = useState(false);
-  const BASE_URL = process.env.BASE_URL;
+  const baseUrl = process.env.REACT_APP_BASE_URL;
 
   const googleLogin = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -23,7 +23,7 @@ const Navbar = () => {
         .then((data) => {
           setUser(data);
           localStorage.setItem("userData", JSON.stringify(data));
-          fetch(`${BASE_URL}/google-login`, {
+          fetch(`${baseUrl}/google-login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

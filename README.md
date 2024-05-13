@@ -1,9 +1,10 @@
 ### EventuraClient
 
-![Eventura Logo](https://github.com/IsuriDisanayaka/eventuraClient/blob/main/client/src/assets/img/logo.png)
+  ![Eventura Logo](https://github.com/IsuriDisanayaka/eventuraClient/blob/main/client/src/assets/img/logo.png)
 
 #### Overview
-EventuraClient is a web-based event-tracking application designed to facilitate efficient event management and scheduling. Built with React and integrated with various web technologies, this project aims to provide a user-friendly interface for organizing and viewing events.
+   EventuraClient is a web-based event-tracking application designed to facilitate efficient event management and scheduling. Built with React and integrated with various web technologies, this project aims to 
+   provide a user-friendly interface for organizing and viewing events.
 
 
 #### Features
@@ -36,24 +37,28 @@ EventuraClient is a web-based event-tracking application designed to facilitate 
    ```bash
    npm install
    ```
-4. **Start the development server**:
+ 4. **Set up environment variables**:
+   Create a .env file in the root directory and add your MongoDB URI, email credentials, and other necessary environment variables:
+     ```bash
+     REACT_APP_BASE_URL=your_api_uri
+     REACT_APP_GOOGLE_CLIENT_ID=your_google_client
+     ```
+5. **Start the development server**:
    ```bash
    npm start
    ```
    Access the API locally at `http://localhost:3000`
 
 #### Deployment
-The application is deployed on Vercel, which automates deployments and provides a seamless integration process for React applications. The deployment involves pushing updates to the repository which are automatically built and deployed by Verceland and can be accessed [here](https://eventura-client.vercel.app).
+   The application is deployed on Vercel, which automates deployments and provides a seamless integration process for React applications. The deployment involves pushing updates to the repository which are 
+   automatically built and deployed by Verceland and can be accessed [here](https://eventura-client.vercel.app).
 
 #### Contributing
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -m 'Add some feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a pull request.
+   1. Fork the repository.
+   2. Create a new branch (`git checkout -b feature-branch`).
+   3. Commit your changes (`git commit -m 'Add some feature'`).
+   4. Push to the branch (`git push origin feature-branch`).
+   5. Open a pull request.
 
-If you'd like to contribute to this project, please follow these guidelines:
-
-###License
-
-This project is licensed under the MIT License.
+#### License
+   This project is licensed under the MIT License.

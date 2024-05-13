@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = process.env.BASE_URL;
 
 export const fetchEvents = async (email) => {
   const response = await axios.get(

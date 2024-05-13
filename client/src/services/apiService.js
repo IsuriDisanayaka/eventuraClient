@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://us-central1-eventura-effbc.cloudfunctions.net/api";
+const BASE_URL = process.env.BASE_URL;
 
 export const fetchEvents = async (email) => {
   const response = await axios.get(
